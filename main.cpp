@@ -15,7 +15,7 @@ int main (int argc, char *argv[]) {
         in_addr_t dst_addr;
         printf("%s\n", "Ping starts");
         if (argc < 2) {
-                printf("%s\n", "You have not specified adress to send ICMP packets");
+                printf("%s\n", "You have not specified address to send ICMP packets");
                 exit(NO_ADDR);
         }
         printf("%s\n", "Validate other args");
