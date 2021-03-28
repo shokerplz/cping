@@ -8,3 +8,4 @@
 #include <time.h>
 #include "errors.h"
 #define DEF_TTL 64
+int create_socket();
