@@ -1,9 +1,40 @@
-#include <netdb.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <netinet/in.h>
-#include "utils/errors.h"
-#include <arpa/inet.h>
+/*                  ---main function---
+*   main function is entry point of program. All program functions will be executed from here
+*   Main argumets are passed through argc and argv variables. argc is int32 variable which indicates lenght of argv array.
+*   User can pass or -v as argv[1] and DNS name or IPv4 address as argv[2] or only dns name or IPv4 address as argv[1].
+*   All other combination of argumets will lead to exception and program will be terminated with error code 212
+*   Example of program execution: ping <IPv4 OR DNS name>
+*               First example:
+*               ping my.mail.ru
+*               argv[0] = ping
+*               argv[1] = my.mail.ru
+*
+*               Second example:
+*               ping -v my.mail.ru
+*               argv[0] = ping
+*               argv[1] = -v
+*               argv[2] = my.mail.ru
+*
+* Exit codes:
+* 0   - Success
+* LOG related errors:
+* 110 - No space for LOG file
+* Validation errors:
+* 211 - IPv4 address or DNS name were not passed
+* 213 - IPv4 address is not valid
+* 212 - DNS name is not valid
+* 255 - Unknown validation error
+* Resolving errors:
+* 151 - Can not resolve DNS name
+* 150 - Can not get IPv4 address from string
+* Socket creation errors:
+* 50  - File descriptor was not received
+* 51  - Timeout setting error
+* Sending/Receiving errors:
+* 200 - Sending error
+* 201 - Receiving error
+* 202 - Error allocating memory for ICMP-echo reply
+*/
 #include "main.h"
 int main(int argc, char* argv[])
 {

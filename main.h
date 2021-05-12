@@ -1,3 +1,10 @@
+															// INCLUDE LIBS
+#include <netdb.h>													
+#include <stdlib.h>
+#include <stdio.h>
+#include <netinet/in.h>
+#include "utils/errors.h"
+#include <arpa/inet.h>
 			 												// VARIABLES DECLARATION
 bool is_dnsname = false; 												// Boolean for check if dns name promted or ip address
 bool valid_args = true;  												// Boolean for check if args are valid
