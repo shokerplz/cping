@@ -1,4 +1,6 @@
-#include "validate_args.h"
+#include <string>
+#include <regex>
+#include <vector>
 bool cNumber(const std::string& str){
    return !str.empty() &&
    (str.find_first_not_of("[0123456789]") == std::string::npos);

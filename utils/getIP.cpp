@@ -1,25 +1,35 @@
-#include "getIP.h"
+#include <netdb.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <errno.h>
+#include "errors.h"
+#include <cstring>
+struct hostent *he;
+struct in_addr **addr_list;
+struct in_addr addr;
 extern int h_errno;
-char *getIP(char *dnsname) {
-        char *ip=(char*)malloc(NI_MAXHOST*sizeof(char));
+int getIP(char *dnsname, char *dst_ip) {
         he = gethostbyname(dnsname);
         if (he == NULL) {
                 switch(h_errno) {
                         case HOST_NOT_FOUND:
-                                printf("%s\n", "Hostname not found");
+				return NO_HOST_FOUND;
                                 break;
                         case NO_ADDRESS:
-                                printf("%s\n", "The requested hostname exists but does not have an IP address");
+				return NO_ADDRESS_FOUND;
                                 break;
                         case NO_RECOVERY:
-                                printf("%s\n", "Fatal name server error");
+				return NO_RECOVERY_PSB;
                                 break;
                         case TRY_AGAIN:
-                                printf("%s\n", "Temporary error on the DNS server. Please try again later");
+				return TRY_AGAIN_LTR; 
                                 break;
                 }
-                return NULL;
+                return DNS_SRV_ERR;
         }
-        strcpy(ip, inet_ntoa(*(struct in_addr *) he->h_addr));
-        return ip;
+        strcpy(dst_ip, inet_ntoa(*(struct in_addr *) he->h_addr));
+        return 0;
 }

@@ -1,1 +1,0 @@
-unsigned short checksum(unsigned short *b, int len);
