@@ -32,7 +32,7 @@ int overflow(FILE* log_fd, int message_len) {
 	return 0;
 }
 
-int log(FILE* log_fd, std::string message)
+int log(FILE* log_fd, char* message)
 {
     struct tm* u;
     std::stringstream ss;
@@ -42,15 +42,15 @@ int log(FILE* log_fd, std::string message)
 	u = localtime(&It);	
 	strftime(buf, sizeof(buf), "[ %d-%m-%Y %H:%M:%S ] ", u);
 	ss << buf << "\t" << message << "\n";
-    message = ss.str();
-    int message_len = message.length();
-	switch (overflow(log_fd, message_len)){
+    std::string write_message = ss.str();
+    int write_message_len = write_message.length();
+	switch (overflow(log_fd, write_message_len)){
         case 0:
             break;
         case 1:
             return 1;
     }
-    if (fwrite(message.data(), sizeof(char), message_len, log_fd) != message_len)
+    if (fwrite(write_message.data(), sizeof(char), write_message_len, log_fd) != write_message_len)
     {
         return 1;
     }
