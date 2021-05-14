@@ -38,7 +38,6 @@
 #include "main.h"
 int main(int argc, char* argv[])
 {
-    FILE* log_fd;
         // Validating input arguments
     switch(validate_args(&is_dnsname, &dst_hostname, &dst_ip, argc, argv, &verbose_output)) {
     case true:
@@ -47,17 +46,27 @@ int main(int argc, char* argv[])
     case false:
         //Arguments are not valid
         diag(ARGS_NOT_VALID);
+        close_log(log_fd,ARGS_NOT_VALID);
         return(ARGS_NOT_VALID);
     }
 
         // Creating log file
     switch (create_log(log_fd)) {
     case 0:
+        switch (log(log_fd, "Logging started")) {
+            case 0:
+                break;
+            case 1:
+                diag(161);
+                break;
+        }
+
         //Log successfully created
         break;
     case 1:
         //No free space on drive
         diag(150);
+        close_log(log_fd,151);
         return(151);
         break;
     }
@@ -68,10 +77,17 @@ int main(int argc, char* argv[])
         switch(getIP(&(*dst_hostname), dst_ip)) {
         case 0:
         // Successfully resolved DNS name
+            switch (log(log_fd, "Successfully resolved DNS name")) {
+            case 0:
+                break;
+            case 1:
+                diag(161);
+                break;
+            }
             break;
         case 1:
         // Can not resolve DNS name
-            switch (log(logfd, "Can not resolve DNS name")) {
+            switch (log(log_fd, "Can not resolve DNS name")) {
             case 0:
         //Successfully logged error
                 break;
@@ -80,6 +96,7 @@ int main(int argc, char* argv[])
                 diag(161);
                 break;
             }
+            close_log(log_fd,DNS_SRV_ERR);
             return(DNS_SRV_ERR);
             break;
         }
@@ -91,7 +108,7 @@ int main(int argc, char* argv[])
     dst_addr = inet_addr(dst_ip);
     switch(dst_addr) {
     case INADDR_NONE:
-        switch (log(logfd, "Can not get IPv4 address from string")) {
+        switch (log(log_fd, "Can not get IPv4 address from string")) {
         case 0:
         //Successfully logged error
             break;
@@ -100,6 +117,7 @@ int main(int argc, char* argv[])
             diag(150);
             break;
         }
+        close_log(log_fd,IP_NOT_VALID);
         return(IP_NOT_VALID);
         break;
     default:
@@ -110,10 +128,17 @@ int main(int argc, char* argv[])
     switch(send_request_icmp(dst_addr, &sockfd)) {
     case 0:
         // Successfully sent ICMP request
+        switch (log(log_fd, "Successfully sent ICMP request")) {
+            case 0:
+                break;
+            case 1:
+                diag(161);
+                break;
+        }
         break;
     case SENT_FAILED:
         //Error occurred while sending ICMP request
-        switch (log(logfd, "Error sending ICMP request")) {
+        switch (log(log_fd, "Error sending ICMP request")) {
         case 0:
         //Successfully logged error
             break;
@@ -122,7 +147,8 @@ int main(int argc, char* argv[])
             diag(200);
             break;
         }
-    diag(SENT_FAILED);
+        diag(SENT_FAILED);
+        close_log(log_fd,SENT_FAILED);
         return SENT_FAILED;
         break;
     }
@@ -130,10 +156,17 @@ int main(int argc, char* argv[])
     switch(get_reply(sockfd)) {
     case 0:
         // Successfully received ICMP-echo response
+        switch (log(log_fd, "Successfully received ICMP-echo response")) {
+            case 0:
+                break;
+            case 1:
+                diag(161);
+                break;
+        }
         break;
     case RCV_FAILED:
         //Timeout receiving ICMP-echo response
-        switch (log(logfd, "Error happend while receiving ICMP request")) {
+        switch (log(log_fd, "Error happend while receiving ICMP request")) {
         case 0:
          //Successfully logged error
             break;
@@ -142,12 +175,13 @@ int main(int argc, char* argv[])
             diag(201);
             break;
         }
-    diag(RCV_FAILED);
+        diag(RCV_FAILED);
+        close_log(log_fd,RCV_FAILED);
         return RCV_FAILED;
         break;
     case -1:
         //Error allocating memory for ICMP-echo reply
-        switch (log(logfd, "Error happend while allocating memory for ICMP socket")) {
+        switch (log(log_fd, "Error happend while allocating memory for ICMP socket")) {
         case 0:
          //Successfully logged error
             break;
@@ -157,9 +191,12 @@ int main(int argc, char* argv[])
             break;
         }
     diag(ALL_MEM_ERR);
+        close_log(log_fd,ALL_MEM_ERR);
         return ALL_MEM_ERR;
         break;
     }
         // Program executed successfully
+    
+    close_log(log_fd,0);
     return 0;
 }

@@ -1,7 +1,7 @@
 #include "icmp_sendrecv.h"
 #include "string"
 #include <sstream>
-int create_log(FILE* log_fd){
+int create_log(FILE*& log_fd){
     if( (log_fd  = fopen( LOG_PATH, "a+" )) == NULL ) return 1;
     else return 0;
 }
@@ -16,7 +16,7 @@ int64_t getFileSize(FILE* log_fd){
 	return file_size;
 }
 
-int overflow(FILE* log_fd, int message_len) { 
+int overflow(FILE*& log_fd, int message_len) { 
 	int owerflow_flag = 0;
     int64_t file_size;
     file_size = getFileSize(log_fd);
@@ -33,8 +33,9 @@ int overflow(FILE* log_fd, int message_len) {
 	return 0;
 }
 
-int log(FILE* log_fd, char* message)
+int log(FILE*& log_fd, char* message)
 {
+
     struct tm* u;
     std::stringstream ss;
     char buf[256];
@@ -51,10 +52,68 @@ int log(FILE* log_fd, char* message)
         case 1:
             return 1;
     }
-    if (fwrite(write_message.data(), sizeof(char), write_message_len, log_fd) != write_message_len)
+    if (fprintf(log_fd,ss.str().data()))
     {
         return 1;
     }
     return 0;
 
+}
+
+
+void close_log(FILE*& log_fd, int error_code){
+    char* message;
+    	switch (error_code) {
+		case FD_NOT_RECEIVED:
+			message = "File descriptor not received";
+			break;
+		case TTL_NOT_SET:
+			message = "Failed setting TTL for socket";
+			break;
+		case TIMEOUT_NOT_SET:
+			message = "Failed setting timeout for socket";
+			break;
+		case SENT_FAILED:
+			message = "Failed sending icmp packet";
+			break;
+		case RCV_FAILED:
+			message = "Failed receiving icmp echo response";
+			break;
+		case NO_ADDR:
+			message = "Address was not specified";
+			break;
+		case ARGS_NOT_VALID:
+			message = "Argumnets are not valid";
+			break;
+		case IP_NOT_VALID:
+			message = "IP address is not valid";
+			break;
+		case NO_HOST_FOUND:
+			message = "No A entry found in DNS record";
+			break;
+		case NO_ADDRESS_FOUND:
+			message = "No address found in DNS record";
+			break;
+		case NO_RECOVERY_PSB:
+			message = "No DNS recovery";
+			break;
+		case TRY_AGAIN_LTR:
+                        message = "DNS server response: Try again later";
+                        break;
+		case DNS_SRV_ERR:
+                        message = "DNS server error";
+                        break;
+		case ALL_MEM_ERR:
+			message = "Error happend while allocating memory for ICMP socket";
+                        break;
+		case UNKNOWN_ERROR:
+			message = "Unknown error happend";
+			break;
+        case 0:
+            message = "Successfully end";
+            break;
+	}
+    log(log_fd,message);
+    log(log_fd,"End logging\n");
+    fclose(log_fd);
 }
