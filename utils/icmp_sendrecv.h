@@ -21,4 +21,4 @@
 #define MAXPACKET       (65536 - 60 - ICMP_MINLEN)
 #define PING_PKT_S 64
 #define MAX_LOG_SIZE 8388806
-#define LOG_PATH 'c:/temp/LOG.txt'
+#define LOG_PATH "c:/temp/LOG.txt"
