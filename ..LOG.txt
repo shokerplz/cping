@@ -1,0 +1,13 @@
+[ 16-05-2021 20:44:29 ] 	Logging started
+[ 16-05-2021 20:45:31 ] 	Logging started
+[ 16-05-2021 20:45:31 ] 	Successfully sent ICMP request
+[ 16-05-2021 20:45:36 ] 	Error happend while receiving ICMP request
+[ 16-05-2021 20:45:36 ] 	Failed receiving icmp echo response
+[ 16-05-2021 20:45:36 ] 	End logging
+
+[ 16-05-2021 20:47:24 ] 	Logging started
+[ 16-05-2021 20:47:24 ] 	Successfully sent ICMP request
+[ 16-05-2021 20:47:29 ] 	Error happend while receiving ICMP request
+[ 16-05-2021 20:47:29 ] 	Failed receiving icmp echo response
+[ 16-05-2021 20:47:29 ] 	End logging
+

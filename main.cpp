@@ -18,18 +18,23 @@
 * Exit codes:
 * 0   - Success
 * LOG related errors:
-* 110 - No space for LOG file
+* 150 - No space for LOG file
+* 151 - Can not write to LOG file
 * Validation errors:
 * 211 - IPv4 address or DNS name were not passed
 * 213 - IPv4 address is not valid
 * 212 - DNS name is not valid
 * 255 - Unknown validation error
 * Resolving errors:
-* 151 - Can not resolve DNS name
-* 150 - Can not get IPv4 address from string
+* 110 - No DNS record found
+* 111 - No A record in DNS record found
+* 112 - Can not get DNS record
+* 113 - DNS server response: try again later
+* 114 - DNS server error
 * Socket creation errors:
-* 50  - File descriptor was not received
-* 51  - Timeout setting error
+*-100 - File descriptor was not received
+*-102 - Timeout setting error
+*-101 - TTL setting error
 * Sending/Receiving errors:
 * 200 - Sending error
 * 201 - Receiving error
@@ -38,6 +43,7 @@
 #include "main.h"
 int main(int argc, char* argv[])
 {
+    FILE* log_fd;
         // Validating input arguments
     switch(validate_args(&is_dnsname, &dst_hostname, &dst_ip, argc, argv, &verbose_output)) {
     case true:
@@ -46,7 +52,6 @@ int main(int argc, char* argv[])
     case false:
         //Arguments are not valid
         diag(ARGS_NOT_VALID);
-        close_log(log_fd,ARGS_NOT_VALID);
         return(ARGS_NOT_VALID);
     }
 
@@ -57,7 +62,7 @@ int main(int argc, char* argv[])
             case 0:
                 break;
             case 1:
-                diag(161);
+                diag(LOG_ERROR);
                 break;
         }
 
@@ -65,9 +70,8 @@ int main(int argc, char* argv[])
         break;
     case 1:
         //No free space on drive
-        diag(150);
-        close_log(log_fd,151);
-        return(151);
+        diag(NO_FREE_SPACE);
+        return(NO_FREE_SPACE);
         break;
     }
     switch(is_dnsname) {
@@ -80,9 +84,9 @@ int main(int argc, char* argv[])
             switch (log(log_fd, "Successfully resolved DNS name")) {
             case 0:
                 break;
-            case 1:
-                diag(161);
-                break;
+	    case 1:
+		diag(LOG_ERROR);
+		break;
             }
             break;
         case 1:
@@ -93,7 +97,7 @@ int main(int argc, char* argv[])
                 break;
             case 1:
         //Unsuccessfully logged error
-                diag(161);
+                diag(DNS_SRV_ERR);
                 break;
             }
             close_log(log_fd,DNS_SRV_ERR);
@@ -114,7 +118,7 @@ int main(int argc, char* argv[])
             break;
         case 1:
         //Unsuccessfully logged error
-            diag(150);
+            diag(IP_NOT_VALID);
             break;
         }
         close_log(log_fd,IP_NOT_VALID);
@@ -132,7 +136,7 @@ int main(int argc, char* argv[])
             case 0:
                 break;
             case 1:
-                diag(161);
+                diag(LOG_ERROR);
                 break;
         }
         break;
@@ -144,7 +148,7 @@ int main(int argc, char* argv[])
             break;
         case 1:
         //Unsuccessfully logged error
-            diag(200);
+            diag(SENT_FAILED);
             break;
         }
         diag(SENT_FAILED);
@@ -160,7 +164,7 @@ int main(int argc, char* argv[])
             case 0:
                 break;
             case 1:
-                diag(161);
+                diag(LOG_ERROR);
                 break;
         }
         break;
@@ -172,7 +176,7 @@ int main(int argc, char* argv[])
             break;
         case 1:
          //Unsuccessfully logged error
-            diag(201);
+            diag(RCV_FAILED);
             break;
         }
         diag(RCV_FAILED);
@@ -187,7 +191,7 @@ int main(int argc, char* argv[])
             break;
         case 1:
          //Unsuccessfully logged error
-            diag(202);
+            diag(ALL_MEM_ERR);
             break;
         }
     diag(ALL_MEM_ERR);

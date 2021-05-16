@@ -18,6 +18,11 @@ const int TRY_AGAIN_LTR    = 113;
 const int DNS_SRV_ERR      = 114;
 /* End */
 
+/* Log errors */
+const int NO_FREE_SPACE	   = 150;
+const int LOG_ERROR	   = 151;
+/* End */
+
 /* Main errors */
 const int NO_ADDR          = 211;
 const int ARGS_NOT_VALID   = 212;
