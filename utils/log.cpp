@@ -1,6 +1,13 @@
-#include "icmp_sendrecv.h"
+#include <stdio.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <time.h>
+#include <fcntl.h>
+#include "errors.h"
 #include "string"
 #include <sstream>
+#define MAX_LOG_SIZE 8388806
+#define LOG_PATH "..LOG.txt"
 int create_log(FILE*& log_fd){
     if( (log_fd  = fopen( LOG_PATH, "a+" )) == NULL ) return 1;
     else return 0;
